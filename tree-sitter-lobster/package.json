@@ -1,0 +1,11 @@
+{
+  "name": "tree-sitter-lobster",
+  "version": "0.1.0",
+  "description": "Lobster grammar for tree-sitter",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "test": "tree-sitter test"
+  }
+}

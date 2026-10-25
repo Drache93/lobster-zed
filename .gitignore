@@ -1,0 +1,5 @@
+/target
+/grammars
+/extension.wasm
+Cargo.lock
+.DS_Store

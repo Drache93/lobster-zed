@@ -1,0 +1,20 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "lobster",
+      "camelcase": "Lobster",
+      "scope": "source.lobster",
+      "path": ".",
+      "file-types": ["lobster"],
+      "highlights": "queries/highlights.scm"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Lobster grammar for tree-sitter",
+    "links": { "repository": "https://github.com/aardappel/lobster" }
+  },
+  "bindings": { "c": false, "go": false, "node": false, "python": false, "rust": false, "swift": false }
+}

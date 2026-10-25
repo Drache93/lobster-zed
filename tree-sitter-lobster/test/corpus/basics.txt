@@ -1,0 +1,542 @@
+============================================================
+String interpolation and escapes
+============================================================
+
+print "x is {x + 1} and {{literal}} \n"
+
+---
+
+(source_file
+  (expression_statement
+    (call_noparen
+      (identifier)
+      (string
+        (string_content)
+        (interpolation
+          (binary_expression
+            (identifier)
+            (integer)))
+        (string_content)
+        (escape_sequence)
+        (string_content)
+        (escape_sequence)
+        (string_content)
+        (escape_sequence)))))
+
+============================================================
+Trailing function with named parameters
+============================================================
+
+let r = map(xs) x, i: x * i
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (call
+      (identifier)
+      (argument_list
+        (identifier))
+      (lambda
+        (parameter_list
+          (parameter
+            (identifier))
+          (parameter
+            (identifier)))
+        (expression_statement
+          (binary_expression
+            (identifier)
+            (identifier)))))))
+
+============================================================
+For with if/elif/else blocks
+============================================================
+
+for(xs) x:
+    if x < 0:
+        print x
+    elif x == 0: print "zero"
+    else:
+        continue
+
+---
+
+(source_file
+  (for_statement
+    (identifier)
+    (loop_variables
+      (identifier))
+    (block
+      (expression_statement
+        (if_expression
+          (binary_expression
+            (identifier)
+            (integer))
+          (block
+            (expression_statement
+              (call_noparen
+                (identifier)
+                (identifier))))
+          (elif_clause
+            (binary_expression
+              (identifier)
+              (integer))
+            (expression_statement
+              (call_noparen
+                (identifier)
+                (string
+                  (string_content)))))
+          (else_clause
+            (block
+              (continue_statement))))))))
+
+============================================================
+Switch expression with ranges
+============================================================
+
+let s = switch v:
+    case 1, 2: "low"
+    case 3..5: "mid"
+    default: "high"
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (switch_expression
+      (identifier)
+      (switch_body
+        (case_clause
+          (integer)
+          (integer)
+          (expression_statement
+            (string
+              (string_content))))
+        (case_clause
+          (range_pattern
+            (integer)
+            (integer))
+          (expression_statement
+            (string
+              (string_content))))
+        (default_clause
+          (expression_statement
+            (string
+              (string_content))))))))
+
+============================================================
+One-line def with noparen call and trailing block
+============================================================
+
+def map2(xs, ys, fun): return map xs.length: fun(xs[_], ys[_])
+
+---
+
+(source_file
+  (function_definition
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier))
+      (parameter
+        (identifier))
+      (parameter
+        (identifier)))
+    (return_statement
+      (call_noparen
+        (identifier)
+        (member_expression
+          (identifier)
+          (identifier))
+        (lambda
+          (expression_statement
+            (call
+              (identifier)
+              (argument_list
+                (index_expression
+                  (identifier)
+                  (identifier))
+                (index_expression
+                  (identifier)
+                  (identifier))))))))))
+
+============================================================
+Noparen call on a member
+============================================================
+
+gl.translate float2_1 * 50.0
+
+---
+
+(source_file
+  (expression_statement
+    (call_noparen
+      (member_expression
+        (identifier)
+        (identifier))
+      (binary_expression
+        (identifier)
+        (float)))))
+
+============================================================
+Name followed by minus is subtraction
+============================================================
+
+x = a - 1
+
+---
+
+(source_file
+  (assignment
+    (identifier)
+    (binary_expression
+      (identifier)
+      (integer))))
+
+============================================================
+Comparison versus explicit type arguments
+============================================================
+
+let a = b<c
+let d = dictionary<string, int>(17)
+let e = v.find_best<int>() x: -x
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (binary_expression
+      (identifier)
+      (identifier)))
+  (variable_declaration
+    (identifier)
+    (generic_call
+      (identifier)
+      (type_arguments
+        (primitive_type)
+        (primitive_type))
+      (argument_list
+        (integer))))
+  (variable_declaration
+    (identifier)
+    (method_call
+      (identifier)
+      (identifier)
+      (type_arguments
+        (primitive_type))
+      (argument_list)
+      (lambda
+        (parameter_list
+          (parameter
+            (identifier)))
+        (expression_statement
+          (unary_expression
+            (identifier)))))))
+
+============================================================
+One-line if with assignments
+============================================================
+
+if rnd(2): a = T { v: 1 } else: a = T { v: 2 }
+
+---
+
+(source_file
+  (expression_statement
+    (if_expression
+      (call
+        (identifier)
+        (argument_list
+          (integer)))
+      (assignment
+        (identifier)
+        (constructor
+          (type_identifier)
+          (initializer
+            (identifier)
+            (integer))))
+      (else_clause
+        (assignment
+          (identifier)
+          (constructor
+            (type_identifier)
+            (initializer
+              (identifier)
+              (integer))))))))
+
+============================================================
+Continuation line with if expression
+============================================================
+
+let t =
+    if d > 2:
+        1
+    else:
+        2
+print t
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (if_expression
+      (binary_expression
+        (identifier)
+        (integer))
+      (block
+        (expression_statement
+          (integer)))
+      (else_clause
+        (block
+          (expression_statement
+            (integer))))))
+  (expression_statement
+    (call_noparen
+      (identifier)
+      (identifier))))
+
+============================================================
+Classes, generics and bit widths
+============================================================
+
+struct vec3<T> : vec2<T>
+    z:T
+
+struct PF:  // packed
+    a:int<8>
+    private b = 1
+    def len(): return a
+
+class Dog : Animal
+
+---
+
+(source_file
+  (class_definition
+    (type_identifier)
+    (type_parameters
+      (type_identifier))
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (type_identifier)))
+    (class_body
+      (field_declaration
+        (identifier)
+        (type_identifier))))
+  (class_definition
+    (type_identifier)
+    (comment)
+    (class_body
+      (field_declaration
+        (identifier)
+        (generic_type
+          (primitive_type)
+          (type_arguments
+            (integer))))
+      (field_declaration
+        (identifier)
+        (integer))
+      (function_definition
+        (identifier)
+        (parameter_list)
+        (return_statement
+          (identifier)))))
+  (class_definition
+    (type_identifier)
+    (type_identifier)))
+
+============================================================
+Enums and unions
+============================================================
+
+enum_flags F:
+    a = 1
+    b, c
+
+union class Shape:
+    Circle(r:float)
+    Point
+
+---
+
+(source_file
+  (enum_definition
+    (type_identifier)
+    (enum_body
+      (enumerator
+        (identifier)
+        (integer))
+      (enumerator
+        (identifier))
+      (enumerator
+        (identifier))))
+  (union_definition
+    (type_identifier)
+    (union_body
+      (union_member
+        (type_identifier)
+        (field_declaration
+          (identifier)
+          (primitive_type)))
+      (union_member
+        (type_identifier)))))
+
+============================================================
+Floats with a trailing dot
+============================================================
+
+let a = 1.
+let c = 1.abs
+switch a:
+    case 1..2: a
+    default: c
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (float))
+  (variable_declaration
+    (identifier)
+    (member_expression
+      (integer)
+      (identifier)))
+  (expression_statement
+    (switch_expression
+      (identifier)
+      (switch_body
+        (case_clause
+          (range_pattern
+            (integer)
+            (integer))
+          (expression_statement
+            (identifier)))
+        (default_clause
+          (expression_statement
+            (identifier)))))))
+
+============================================================
+Conditional declaration chain
+============================================================
+
+if let f = maybe() and let g = maybe():
+    f + g
+
+---
+
+(source_file
+  (expression_statement
+    (if_expression
+      (conditional_declaration
+        (identifier)
+        (call
+          (identifier)
+          (argument_list)))
+      (conditional_declaration
+        (identifier)
+        (call
+          (identifier)
+          (argument_list)))
+      (block
+        (expression_statement
+          (binary_expression
+            (identifier)
+            (identifier)))))))
+
+============================================================
+Method chain continued on the next line
+============================================================
+
+let x = foo
+    .bar()
+    .baz(1)
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (method_call
+      (method_call
+        (identifier)
+        (identifier)
+        (argument_list))
+      (identifier)
+      (argument_list
+        (integer)))))
+
+============================================================
+Lambda continuation with fn on the next line
+============================================================
+
+if_else(c):
+    a
+fn:
+    b
+
+---
+
+(source_file
+  (expression_statement
+    (call
+      (identifier)
+      (argument_list
+        (identifier))
+      (lambda
+        (block
+          (expression_statement
+            (identifier))))
+      (lambda
+        (block
+          (expression_statement
+            (identifier)))))))
+
+============================================================
+Imports, namespaces and operators
+============================================================
+
+import std
+import from "dir"
+namespace my.ns
+def operator<(o:T): return a < o.a
+def operator[](i:int): return i
+
+---
+
+(source_file
+  (import_statement
+    (module_path
+      (identifier)))
+  (import_statement
+    (string
+      (string_content)))
+  (namespace_statement
+    (module_path
+      (identifier)
+      (identifier)))
+  (function_definition
+    (operator_name)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (return_statement
+      (binary_expression
+        (identifier)
+        (member_expression
+          (identifier)
+          (identifier)))))
+  (function_definition
+    (operator_name)
+    (parameter_list
+      (parameter
+        (identifier)
+        (primitive_type)))
+    (return_statement
+      (identifier))))

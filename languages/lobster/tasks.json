@@ -1,0 +1,15 @@
+[
+  {
+    "label": "lobster $ZED_FILENAME",
+    "command": "lobster",
+    "args": ["\"$ZED_FILE\""],
+    "cwd": "$ZED_DIRNAME",
+    "tags": ["lobster-file", "lobster-test"]
+  },
+  {
+    "label": "lobster --compile-only $ZED_FILENAME",
+    "command": "lobster",
+    "args": ["--compile-only", "\"$ZED_FILE\""],
+    "cwd": "$ZED_DIRNAME"
+  }
+]
