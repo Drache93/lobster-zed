@@ -1,0 +1,15 @@
+id = "lobster"
+name = "Lobster"
+description = "Lobster language support: highlighting, outline, runnables and the Lobster language server."
+version = "0.1.0"
+schema_version = 1
+authors = ["Dominic <dominic@cassidy.casa>"]
+
+[grammars.lobster]
+repository = "file:///Users/odinsson/lobster-zed"
+rev = "dc0d57f84b8278ba38e4a0909e6f7498dea02b8e"
+path = "tree-sitter-lobster"
+
+[language_servers.lobster-lsp]
+name = "Lobster LSP"
+languages = ["Lobster"]
