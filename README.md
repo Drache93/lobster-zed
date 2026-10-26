@@ -6,7 +6,13 @@ Zed support for the [Lobster](https://github.com/aardappel/lobster) language:
 - bracket matching, auto-indent, outline panel, function/class text objects
 - a ▶ run button on each file and on `run_test("...")` blocks
 - the Lobster language server (`dev/lsp` in the Lobster repo): errors, completion, hover,
-  go to definition
+  go to definition. A file is checked as part of the program that imports it (found by
+  following the imports of the `.lobster` files around it), with each warning and error shown
+  in the file it is about.
+
+Checking files as part of their program, and hover types for functions nothing calls yet,
+need Lobster changes that aren't upstream yet. With upstream's server each file is compiled on
+its own, so a file that is only ever imported shows errors about names its program declares.
 
 ## Setup
 
@@ -45,9 +51,10 @@ tree-sitter generate
 tree-sitter test
 ```
 
-Zed builds the grammar from a git commit, so after changing it: commit, then put the new
-commit's SHA in `rev` under `[grammars.lobster]` in `extension.toml` and reinstall the dev
-extension.
+Zed builds the grammar from a commit of `repository` under `[grammars.lobster]` in
+`extension.toml`, so after changing it: commit and push, then put the new commit's SHA in `rev`
+and reinstall the dev extension. To try a grammar change before pushing, point `repository` at
+your checkout with a `file://` URL.
 
 The grammar decides by syntax alone where the reference parser consults its symbol table, so a
 few things differ:
@@ -58,3 +65,7 @@ few things differ:
   arguments, falling back to a comparison.
 - A trailing block inside an unclosed bracket spanning lines (as in `modules/match.lobster`) is
   not supported.
+
+## License
+
+MIT, see [LICENSE](LICENSE).

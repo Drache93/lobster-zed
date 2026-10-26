@@ -6,7 +6,7 @@ schema_version = 1
 authors = ["Dominic <dominic@cassidy.casa>"]
 
 [grammars.lobster]
-repository = "file:///Users/odinsson/lobster-zed"
+repository = "https://github.com/Drache93/lobster-zed"
 rev = "dc0d57f84b8278ba38e4a0909e6f7498dea02b8e"
 path = "tree-sitter-lobster"
 
