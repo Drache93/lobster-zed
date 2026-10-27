@@ -1,18 +1,43 @@
 # Lobster for Zed
 
-Zed support for the [Lobster](https://github.com/aardappel/lobster) language:
+Zed support for the [Lobster](https://github.com/aardappel/lobster) language.
 
-- syntax highlighting, from a tree-sitter grammar written against `docs/source/language_spec.md`
-- bracket matching, auto-indent, outline panel, function/class text objects
-- a ▶ run button on each file and on `run_test("...")` blocks
-- the Lobster language server (`dev/lsp` in the Lobster repo): errors, completion, hover,
-  go to definition. A file is checked as part of the program that imports it (found by
-  following the imports of the `.lobster` files around it), with each warning and error shown
-  in the file it is about.
+## What works
 
-Checking files as part of their program, and hover types for functions nothing calls yet,
-need Lobster changes that aren't upstream yet. With upstream's server each file is compiled on
-its own, so a file that is only ever imported shows errors about names its program declares.
+These come from the extension itself and work with any Lobster:
+
+| Feature | Notes |
+|---|---|
+| Syntax highlighting | From a tree-sitter grammar written against `docs/source/language_spec.md`. Parses 211 of the 212 `.lobster` files in Lobster's samples, tests and modules (see [Grammar differences](#grammar-differences)). |
+| Bracket matching, auto-indent | Indents after `:` and dedents for `else`, `elif` and `case`. |
+| Outline panel, breadcrumbs | Functions, classes, structs, enums and their fields. |
+| Text objects | Function, class and comment (in vim mode: `af`, `if`, `ac`, `ic`, `gc`). |
+| ▶ Run buttons | On each file and on each `run_test("...")` block. They run `lobster`, which must be on `PATH`. |
+
+These come from the Lobster language server (`dev/lsp` in a Lobster checkout):
+
+| Feature | Upstream server | With the `lsp-whole-program` changes |
+|---|---|---|
+| Errors and warnings | Each file is compiled on its own, so a file that is only ever imported shows errors about names its program declares, and messages about other files land on the open one. | Each file is checked as part of the program(s) that import it, found by following imports, with no settings. Each message shows in the file and line it is about, as you type. |
+| Hover | Signatures and types; parameter types of functions nothing calls show as `undefined`. | Declared types everywhere, including parameters and locals and generic types like `dictionary<K, V>`. |
+| Go to definition | Functions and globals, from the main file of a program. | Functions, variables, parameters, fields and types, in any file of the program. Builtins like `gl.read_texture` jump to their C++ source in the Lobster checkout. |
+| Unused code | Unused local variables (compiler warning). | Also unused functions (each overload), globals and imports, shown faded, once every program that includes the file has been checked. |
+| Completion | Builtin functions only. | Same. |
+| Quick fix | `var` → `let` where the compiler suggests it. | Same. |
+
+The `lsp-whole-program` changes are not in upstream Lobster yet. They're proposed in
+[aardappel/lobster#459](https://github.com/aardappel/lobster/pull/459) and open to discussion.
+
+## What doesn't work (yet)
+
+- Completion of your own functions, variables, fields and types: only builtins complete.
+- Find references, rename, signature help, formatting, document and workspace symbols from the
+  server (the outline panel works from the grammar), semantic highlighting.
+- Diagnostics mark whole lines: the compiler reports lines, not columns.
+- After an error, the compiler stops reporting some warnings, and nothing is marked unused,
+  until the error is fixed.
+- The extension isn't in Zed's extension registry: install it as a dev extension (below). It
+  doesn't bundle Lobster or the language server: you need a Lobster checkout built from source.
 
 ## Setup
 
@@ -43,6 +68,8 @@ its own, so a file that is only ever imported shows errors about names its progr
 
 3. In Zed: command palette → `zed: install dev extension` → pick this directory.
 
+After rebuilding Lobster or its server, run `editor: restart language server` in Zed.
+
 ## Working on the grammar
 
 ```sh
@@ -55,6 +82,8 @@ Zed builds the grammar from a commit of `repository` under `[grammars.lobster]` 
 `extension.toml`, so after changing it: commit and push, then put the new commit's SHA in `rev`
 and reinstall the dev extension. To try a grammar change before pushing, point `repository` at
 your checkout with a `file://` URL.
+
+### Grammar differences
 
 The grammar decides by syntax alone where the reference parser consults its symbol table, so a
 few things differ:
