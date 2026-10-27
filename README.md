@@ -13,6 +13,7 @@ These come from the extension itself and work with any Lobster:
 | Outline panel, breadcrumbs | Functions, classes, structs, enums and their fields. |
 | Text objects | Function, class and comment (in vim mode: `af`, `if`, `ac`, `ic`, `gc`). |
 | ▶ Run buttons | On each file and on each `run_test("...")` block. They run `lobster`, which must be on `PATH`. |
+| File icon | A lobster for `.lobster` files, in the "Zed + Lobster" icon theme (see [File icon](#file-icon)). |
 
 These come from the Lobster language server (`dev/lsp` in a Lobster checkout):
 
@@ -69,6 +70,21 @@ The `lsp-whole-program` changes are not in upstream Lobster yet. They're propose
 3. In Zed: command palette → `zed: install dev extension` → pick this directory.
 
 After rebuilding Lobster or its server, run `editor: restart language server` in Zed.
+
+### File icon
+
+Zed can't add one file type's icon to the default icon theme, so the extension comes with an
+icon theme, "Zed + Lobster", which is Zed's default with a lobster for `.lobster` files. To use
+it, run `icon theme selector: toggle` and pick "Zed + Lobster (Dark)" or "(Light)", or set it in
+`settings.json`:
+
+```json
+"icon_theme": "Zed + Lobster (Dark)"
+```
+
+It doesn't combine with other icon themes. It copies which icon the default theme gives each
+file name and extension, so file types Zed adds icons for later show as plain files until
+`icon_themes/lobster.json` is regenerated with `python3 scripts/update_icon_theme.py`.
 
 ## Working on the grammar
 
