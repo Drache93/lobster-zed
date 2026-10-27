@@ -48,7 +48,8 @@ def main():
             "appearance": appearance,
             "file_stems": dict(sorted(stems.items())),
             "file_suffixes": dict(sorted(suffixes.items())),
-            "file_icons": {"lobster": {"path": "./icons/lobster.svg"}},
+            # Icons from extensions are drawn in their own colours rather than the theme's.
+            "file_icons": {"lobster": {"path": f"./icons/lobster_{appearance}.svg"}},
         }
 
     family = {

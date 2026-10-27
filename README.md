@@ -82,7 +82,9 @@ it, run `icon theme selector: toggle` and pick "Zed + Lobster (Dark)" or "(Light
 "icon_theme": "Zed + Lobster (Dark)"
 ```
 
-It doesn't combine with other icon themes. It copies which icon the default theme gives each
+Zed draws icons from extensions in their own colours rather than tinting them with the colour
+theme, so the lobster uses the icon colours of Zed's One Dark and One Light themes and can be a
+shade off in other colour themes. It doesn't combine with other icon themes. It copies which icon the default theme gives each
 file name and extension, so file types Zed adds icons for later show as plain files until
 `icon_themes/lobster.json` is regenerated with `python3 scripts/update_icon_theme.py`.
 

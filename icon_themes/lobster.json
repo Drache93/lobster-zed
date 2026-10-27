@@ -311,7 +311,7 @@
       },
       "file_icons": {
         "lobster": {
-          "path": "./icons/lobster.svg"
+          "path": "./icons/lobster_dark.svg"
         }
       }
     },
@@ -623,7 +623,7 @@
       },
       "file_icons": {
         "lobster": {
-          "path": "./icons/lobster.svg"
+          "path": "./icons/lobster_light.svg"
         }
       }
     }
