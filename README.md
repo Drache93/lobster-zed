@@ -17,28 +17,36 @@ These come from the extension itself and work with any Lobster:
 
 These come from the Lobster language server (`dev/lsp` in a Lobster checkout):
 
-| Feature | Upstream server | With the `lsp-whole-program` changes |
+| Feature | Upstream server | With the Lobster changes (see below) |
 |---|---|---|
-| Errors and warnings | Each file is compiled on its own, so a file that is only ever imported shows errors about names its program declares, and messages about other files land on the open one. | Each file is checked as part of the program(s) that import it, found by following imports, with no settings. Each message shows in the file and line it is about, as you type. |
-| Hover | Signatures and types; parameter types of functions nothing calls show as `undefined`. | Declared types everywhere, including parameters and locals and generic types like `dictionary<K, V>`. |
+| Errors and warnings | Each file is compiled on its own, so a file that is only ever imported shows errors about names its program declares, and messages about other files land on the open one. Whole lines are marked. | Each file is checked as part of the program(s) that import it, found by following imports, with no settings, as you type. Each message shows in the file it is about, marking the name it quotes. While a program has errors, the warnings it had stay, moving with your edits. |
+| Hover | Signatures and types; parameter types of functions nothing calls show as `undefined`. | Inferred types for called functions, declared ones otherwise, for parameters and locals too, and generic types like `dictionary<K, V>`. |
 | Go to definition | Functions and globals, from the main file of a program. | Functions, variables, parameters, fields and types, in any file of the program. Builtins like `gl.read_texture` jump to their C++ source in the Lobster checkout. |
+| Find references, rename | — | Functions, variables, parameters, fields, types and enum values, across all programs that include them. Not what Lobster's own modules declare. |
+| Completion | Builtin functions only. | Also the variables in scope, globals, functions, types and enum values, and after a dot the fields and methods of the variable's class. |
+| Signature help | — | Parameters of the call you're typing, for your functions and builtins. |
+| Symbols | — | Document symbols, and workspace symbols (project-wide search for functions, types, fields and globals). |
 | Unused code | Unused local variables (compiler warning). | Also unused functions (each overload), globals and imports, shown faded, once every program that includes the file has been checked. |
-| Completion | Builtin functions only. | Same. |
 | Quick fix | `var` → `let` where the compiler suggests it. | Same. |
 
-The `lsp-whole-program` changes are not in upstream Lobster yet. They're proposed in
-[aardappel/lobster#459](https://github.com/aardappel/lobster/pull/459) and open to discussion.
+The Lobster changes are not in upstream Lobster yet. The first part (checking whole programs,
+hover, definition and unused code) is proposed in
+[aardappel/lobster#459](https://github.com/aardappel/lobster/pull/459) and open to discussion. The
+rest (references, rename, completion, signature help, symbols, and the diagnostics changes) builds
+on it, from a compiler option `--index` that writes a program's definitions and their uses, and
+isn't proposed yet.
 
 ## What doesn't work (yet)
 
-- Completion of your own functions, variables, fields and types: only builtins complete.
-- Find references, rename, signature help, formatting, document and workspace symbols from the
-  server (the outline panel works from the grammar), semantic highlighting.
-- Diagnostics mark whole lines: the compiler reports lines, not columns.
-- After an error, the compiler stops reporting some warnings, and nothing is marked unused,
-  until the error is fixed.
+- Formatting: Lobster has no formatter or agreed layout to format to.
+- Semantic highlighting from the server: highlighting comes from the grammar.
+- Uses of a type in annotations (`x:Foo`) are found by name, so references and rename of a type
+  also match an unrelated variable or field with the same name used without a dot.
+- Diagnostics mark the name a message quotes, or else the line: the compiler reports lines, not
+  columns.
 - The extension isn't in Zed's extension registry: install it as a dev extension (below). It
-  doesn't bundle Lobster or the language server: you need a Lobster checkout built from source.
+  doesn't bundle Lobster or the language server: you need a Lobster checkout built from source,
+  with the changes above for most of the server's features.
 
 ## Setup
 
