@@ -28,17 +28,17 @@ These come from the Lobster language server (`dev/lsp` in a Lobster checkout):
 | Symbols | — | Document symbols, and workspace symbols (project-wide search for functions, types, fields and globals). |
 | Unused code | Unused local variables (compiler warning). | Also unused functions (each overload), globals and imports, shown faded, once every program that includes the file has been checked. |
 | Quick fix | `var` → `let` where the compiler suggests it. | Same. |
+| Formatting | — | The layout of Lobster's [style guide](https://github.com/aardappel/lobster/blob/master/docs/source/style_guide.md), with no options (see [Formatting](#formatting)). |
 
 The Lobster changes are not in upstream Lobster yet. The first part (checking whole programs,
 hover, definition and unused code) is proposed in
 [aardappel/lobster#459](https://github.com/aardappel/lobster/pull/459) and open to discussion. The
 rest (references, rename, completion, signature help, symbols, and the diagnostics changes) builds
 on it, from a compiler option `--index` that writes a program's definitions and their uses, and
-isn't proposed yet.
+isn't proposed yet; nor is the formatter.
 
 ## What doesn't work (yet)
 
-- Formatting: Lobster has no formatter or agreed layout to format to.
 - Semantic highlighting from the server: highlighting comes from the grammar.
 - Uses of a type in annotations (`x:Foo`) are found by name, so references and rename of a type
   also match an unrelated variable or field with the same name used without a dot.
@@ -95,6 +95,49 @@ theme, so the lobster uses the icon colours of Zed's One Dark and One Light them
 shade off in other colour themes. It doesn't combine with other icon themes. It copies which icon the default theme gives each
 file name and extension, so file types Zed adds icons for later show as plain files until
 `icon_themes/lobster.json` is regenerated with `python3 scripts/update_icon_theme.py`.
+
+## Formatting
+
+The server formats Lobster in one layout, like `gofmt` (and stricter, like `gofumpt`): the one
+in Lobster's [style guide](https://github.com/aardappel/lobster/blob/master/docs/source/style_guide.md)
+and its own code where the guide leaves something open. There are no options. Zed formats a file
+when you save it (`editor: format` formats it now); to not format on save:
+
+```json
+"languages": { "Lobster": { "format_on_save": "off" } }
+```
+
+It changes whitespace only, never which line code is on (other than blank lines):
+
+- 4 spaces per block. A line continuing the one before after an operator is indented once more,
+  or twice if a block follows (`if a and` / `b:`), so the block stands out.
+- In brackets, a line lines up after the bracket, or is indented once if the bracket ends its line.
+- Spaces around binary operators and `->`, after `,` and the `:` of a block, inside `[ ]` for a
+  vector and `{ }` for a constructor; none inside `( )`, in `xs[i]`, `a:int`, `a::T`, `-x`,
+  `f<T>`, `a.b`.
+- At most one blank line in a row, and none at the start of a block or the file.
+- Two spaces before a comment at the end of a line, and those on consecutive lines line up.
+
+Where a space changes what Lobster parses, it's kept as it is: `f(x)` and `f (x)`, `f -1`, and a
+`<` straight after a name (`f<T>`, which might also be a comparison, `a<b`).
+
+It checks that what it formats parses the same before and after (the same tokens, blocks and
+whitespace where the parser looks at it), and refuses what it can't format safely, such as code
+that doesn't lex or indents inconsistently: Zed then shows why and changes nothing. Code with
+other errors is formatted, which can change which error the compiler reports (a function's name
+followed by `=` becomes `f = (...)`, which Lobster takes for a call). It's tested
+by formatting all of Lobster's code and checking that it compiles to the same and its tests
+pass, and by fuzzing (scrambling code's whitespace, which must format back the same, and
+breaking it, which must be refused or format stably).
+
+It's also a command, `lobsterfmt` (built next to the server):
+
+```sh
+node ~/Dev/lobster/dev/lsp/webpack-out/lobsterfmt.js -l -w path/to/code
+```
+
+`-l` lists the files that aren't formatted, `-w` formats them in place, and without either it
+prints the formatted files (or formats standard input).
 
 ## Working on the grammar
 
